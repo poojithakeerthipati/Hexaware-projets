@@ -1,0 +1,169 @@
+# AGENDA
+
+- EQUI JOIN , NATURAL JOIN , INNER JOIN
+- SUB QUERIES - EXISTS , NON-EXUSTS
+- UNION , INTERSECT , EXCEPT
+- LIMIT AND OFFSET
+- DIFFERENT KEY AND ACID (THEORY)
+- GROUP BY/ORDER BY (ADVANCE)
+
+# links
+
+## SQL DOCUMENTATION
+- https://learn.microsoft.com/en-us/sql/t-sql/queries/select-order-by-clause-transact-sql?view=sql-server-ver16
+
+
+## OFFSET AMD LIMIT
+
+```sql
+SELECT *
+FROM ORDERS
+ORDER BY PURCH_AMT DESC
+OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
+```
+
+## variables
+
+ - A Way to get the value from the users.
+
+### syntax
+
+```sql
+DECLARE @VARIABLE_NAME <DATA_TYPE> = <VALUE>
+```
+
+```sql
+DECLARE @n INT = 5;
+SELECT *,FORMAT( ORD_DATE, 'dd MMM yyyy' )  
+FROM ORDERS ORDER BY PURCH_AMT DESC
+OFFSET 0 ROWS  
+FETCH NEXT @n ROWS ONLY;
+```
+
+# UNION , INTERSECT AND EXPECT 
+//(SET THEORY)
+
+## UNION 
+- A U B - ALL VALUES WITHOUT REPITITION
+
+```sql
+SELECT DEPARTMENT FROM EMPLOYERS
+UNION
+SELECT DEPARTMENT FROM APPLICANTS
+```
+
+## INTERSECT
+- A /\ B - COMMON ITEMS
+
+```sql
+SELECT DEPARTMENT FROM EMPLOYERS
+INTERSECT
+SELECT DEPARTMENT FROM APPLICANTS
+```
+
+## EXCEPT
+- A - B - UNCOMMON VALUES
+
+```sql
+SELECT DEPARTMENT FROM EMPLOYERS
+EXCEPT
+SELECT DEPARTMENT FROM APPLICANTS
+```
+
+## -- TASK-1
+### -- LIST ALL DISTINCT PRODUCTS THAT ARE EITHER IN STOCK OR HAVE BEEN ORDERED
+- CLUE : SUB-QUERY
+
+```sql
+SELECT PRODUCTNAME FROM PRODUCTS WHERE InStock = 'YES'
+UNION
+SELECT PRODUCTNAME FROM PRODUCTS WHERE ProductID IN(SELECT ProductID FROM ORDERS);
+```
+
+
+## -- TASK-2
+### -- IDENTIFY THE PRODUCTS THAT ARE BOTH IN STOCK AND HAVE BEEN ORDERED
+
+```sql
+SELECT PRODUCTNAME FROM PRODUCTS WHERE InStock = 'YES'
+INTERSECT
+SELECT PRODUCTNAME FROM PRODUCTS WHERE ProductID IN(SELECT ProductID FROM ORDERS);
+```
+
+
+## --TASK-3
+### --FIND THE PRODUCTS THAT ARE IN STOCK BUT HAVE NEVER BEEN ORDERED
+
+```sql
+SELECT PRODUCTNAME FROM PRODUCTS WHERE InStock = 'YES'
+EXCEPT
+SELECT PRODUCTNAME FROM PRODUCTS WHERE ProductID IN(SELECT ProductID FROM ORDERS);
+```
+
+## GROUP BY/ORDER BY
+
+- when we have two levels of ordering the columns
+
+```sql
+CREATE TABLE EmployeeSales (
+    EmployeeID INT,
+    Region VARCHAR(50),
+    Category VARCHAR(50),
+    Quarter VARCHAR(10),
+    SalesAmount DECIMAL(10,2)
+);
+ 
+INSERT INTO EmployeeSales (EmployeeID, Region, Category, Quarter, SalesAmount)
+VALUES
+    (101, 'North', 'Electronics', 'Q1', 1200.00),
+    (101, 'North', 'Electronics', 'Q2', 1500.00),
+    (102, 'North', 'Clothing', 'Q1', 800.00),
+    (102, 'North', 'Clothing', 'Q2', 950.00),
+    (103, 'South', 'Electronics', 'Q1', 1000.00),
+    (103, 'South', 'Clothing', 'Q1', 1200.00),
+    (104, 'East', 'Electronics', 'Q2', 1150.00),
+    (104, 'East', 'Clothing', 'Q2', 500.00),
+    (105, 'West', 'Electronics', 'Q1', 1900.00),
+    (105, 'West', 'Clothing', 'Q1', 1100.00),
+    (105, 'West', 'Electronics', 'Q2', 2100.00),
+    (105, 'West', 'Clothing', 'Q2', 1300.00);
+
+SELECT * FROM EmployeeSales;
+
+SELECT * FROM EmployeeSales ORDER BY Region,SalesAmount DESC;
+```
+
+```sql
+-- year to date sale - 1st day of financial year to today
+-- today (How much sales?)
+
+SELECT REGION,CATEGORY,SUM(SALESAMOUNT) AS YEAR_TO_DATE FROM EmployeeSales
+GROUP BY REGION,Category
+ORDER BY REGION ;
+```
+
+## -- GROUPING SETS
+### -- -R-C , R-Q , R,Q
+
+```sql
+SELECT * FROM EmployeeSales;
+
+SELECT REGION, CATEGORY , [QUARTER] ,SUM(SALESAMOUNT) 
+FROM EmployeeSales
+GROUP BY GROUPING SETS(
+	(REGION , CATEGORY),
+	(REGION , [QUARTER]),Region,Category
+)
+```
+
+- ORDER BY USING GROUPING SETS
+
+```sql
+SELECT REGION, CATEGORY , [QUARTER] ,SUM(SALESAMOUNT) 
+FROM EmployeeSales
+GROUP BY GROUPING SETS(
+	(REGION , CATEGORY),
+	(REGION , [QUARTER]),Region,Category
+)
+ORDER BY GROUPING(REGION),GROUPING(CATEGORY) , GROUPING([QUARTER]);
+```
