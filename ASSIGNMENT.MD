@@ -65,7 +65,7 @@ CREATE TABLE [BOOKING] (
 ```
 
 ### 3.Create an ERD (Entity Relationship Diagram) for the database.  
-![ER Diagram](task-1_ER.png)
+![ER_Diagram](ER_DIAGRAM.png)
 
 ### 4. Create appropriate Primary Key and Foreign Key constraints for referential integrity. 
 
