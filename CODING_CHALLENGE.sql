@@ -1,5 +1,6 @@
 use coding_EXAM;
 
+
 --2. Create tables for Companies, Jobs, Applicants and Applications. 
 --3. Define appropriate primary keys, foreign keys, and constraints. 
 CREATE TABLE [COMPANIES]
